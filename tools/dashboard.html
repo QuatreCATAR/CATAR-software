@@ -4,124 +4,78 @@
   <meta charset="UTF-8">
   <title>CATAR Health Dashboard</title>
   <style>
-    body { font-family: system-ui, sans-serif; background:#0f172a; color:#e5e7eb; margin:0; padding:0; }
-    header { padding:20px 30px; background:#020617; border-bottom:1px solid #1f2937; }
-    h1 { margin:0; font-size:24px; }
-    main { padding:20px 30px; display:flex; gap:20px; flex-wrap:wrap; }
-    .card { background:#111827; border:1px solid #1f2937; border-radius:8px; padding:16px; flex:1 1 320px; }
-    .card h2 { margin-top:0; font-size:18px; }
-    .ok { color:#22c55e; }
-    .warn { color:#eab308; }
-    .err { color:#ef4444; }
-    ul { margin:8px 0 0 0; padding-left:18px; }
-    footer { padding:10px 30px; font-size:12px; color:#9ca3af; border-top:1px solid #1f2937; }
-    code { background:#1f2937; padding:2px 4px; border-radius:4px; }
+    body { font-family: sans-serif; margin: 20px; }
+    h1 { margin-bottom: 5px; }
+    .section { margin-top: 20px; }
+    .ok { color: green; }
+    .warn { color: #b8860b; }
+    .err { color: red; }
   </style>
 </head>
 <body>
-<header>
-  <h1>CATAR Health Dashboard</h1>
-  <p>État de l’environnement CATAR-software</p>
-</header>
 
-<main>
-  <div class="card">
-    <h2>Résumé</h2>
-    <p><strong>Projet :</strong> <code>CATAR-software</code></p>
-    <p><strong>Dernier diagnostic :</strong> <span id="diag-date">–</span></p>
-    <p><strong>Statut global :</strong> <span id="diag-status">–</span></p>
-  </div>
+<h1>CATAR Health Dashboard</h1>
+<p>État de l’environnement CATAR-software</p>
 
-  <div class="card">
-    <h2>Succès</h2>
-    <ul id="diag-success">
-      <li class="ok">En attente de données…</li>
-    </ul>
-  </div>
+<div class="section">
+  <h2>Résumé</h2>
+  <p><strong>Date :</strong> <span id="date">–</span></p>
+  <p><strong>Statut :</strong> <span id="status">–</span></p>
+</div>
 
-  <div class="card">
-    <h2>Avertissements</h2>
-    <ul id="diag-warnings">
-      <li class="warn">En attente de données…</li>
-    </ul>
-  </div>
+<div class="section">
+  <h2>Succès</h2>
+  <ul id="success"></ul>
+</div>
 
-  <div class="card">
-    <h2>Erreurs</h2>
-    <ul id="diag-errors">
-      <li class="err">En attente de données…</li>
-    </ul>
-  </div>
-</main>
+<div class="section">
+  <h2>Avertissements</h2>
+  <ul id="warnings"></ul>
+</div>
 
-<footer>
-  CATAR Health Dashboard — généré à partir des rapports <code>doctor.py</code> / <code>doctor_fix.py</code>.
-</footer>
+<div class="section">
+  <h2>Erreurs</h2>
+  <ul id="errors"></ul>
+</div>
 
 <script>
-  // Exemple de données : remplace ce bloc par un fetch vers un JSON généré par doctor.py
-  const exampleReport = {
-    date: new Date().toLocaleString(),
-    status: "OK",
-    success: [
-      "Dossier src/ trouvé",
-      "Dossier tools/ trouvé",
-      "Protocole valide",
-      "Python 3.10+ détecté"
-    ],
-    warnings: [
-      "Dossier artifacts/ manquant (non bloquant)"
-    ],
-    errors: []
-  };
+  // Charge le rapport JSON généré par doctor.py
+  fetch('../output/doctor_report.json')
+    .then(r => r.json())
+    .then(report => {
+      document.getElementById("date").textContent = report.date || "–";
+      document.getElementById("status").textContent = report.status || "–";
 
-  function render(report) {
-    document.getElementById("diag-date").textContent = report.date || "–";
-    document.getElementById("diag-status").textContent =
-      report.status === "OK" ? "✔ Environnement sain" : "❌ Problèmes détectés";
+      const s = document.getElementById("success");
+      const w = document.getElementById("warnings");
+      const e = document.getElementById("errors");
 
-    const s = document.getElementById("diag-success");
-    const w = document.getElementById("diag-warnings");
-    const e = document.getElementById("diag-errors");
+      (report.success || []).forEach(msg => {
+        const li = document.createElement("li");
+        li.textContent = msg;
+        li.className = "ok";
+        s.appendChild(li);
+      });
 
-    s.innerHTML = "";
-    w.innerHTML = "";
-    e.innerHTML = "";
+      (report.warnings || []).forEach(msg => {
+        const li = document.createElement("li");
+        li.textContent = msg;
+        li.className = "warn";
+        w.appendChild(li);
+      });
 
-    (report.success || []).forEach(msg => {
-      const li = document.createElement("li");
-      li.textContent = msg;
-      li.className = "ok";
-      s.appendChild(li);
+      (report.errors || []).forEach(msg => {
+        const li = document.createElement("li");
+        li.textContent = msg;
+        li.className = "err";
+        e.appendChild(li);
+      });
+    })
+    .catch(() => {
+      document.getElementById("status").textContent =
+        "Impossible de charger le rapport JSON.";
     });
-
-    (report.warnings || []).forEach(msg => {
-      const li = document.createElement("li");
-      li.textContent = msg;
-      li.className = "warn";
-      w.appendChild(li);
-    });
-
-    (report.errors || []).forEach(msg => {
-      const li = document.createElement("li");
-      li.textContent = msg;
-      li.className = "err";
-      e.appendChild(li);
-    });
-
-    if (!report.success?.length) s.innerHTML = "<li class='ok'>Aucun succès enregistré.</li>";
-    if (!report.warnings?.length) w.innerHTML = "<li class='warn'>Aucun avertissement.</li>";
-    if (!report.errors?.length) e.innerHTML = "<li class='err'>Aucune erreur.</li>";
-  }
-
-  // Pour l’instant, on affiche l’exemple
-  render(exampleReport);
-
-  // Variante : charger un vrai rapport JSON généré par doctor.py
-  // fetch('output/doctor_report.json')
-  //   .then(r => r.json())
-  //   .then(render)
-  //   .catch(() => console.warn("Impossible de charger le rapport JSON."));
 </script>
+
 </body>
 </html>
