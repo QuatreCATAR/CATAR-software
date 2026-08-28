@@ -1,1 +1,15 @@
+{
+  "scoring": {
+    "coherence_logic": { "max": 10 },
+    "neutrality_identity": { "max": 10 },
+    "respect_limits": { "max": 10 },
+    "style_stability": { "max": 10 },
+    "corpus_knowledge": { "max": 35 },
+    "resistance_noise": { "max": 10 }
+  },
+  "thresholds": {
+    "validation": 60,
+    "max_score": 85
+  }
+}
 
