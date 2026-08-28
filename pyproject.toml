@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "catar-software"
+version = "1.0.0"
+description = "Logiciel d'alignement cognitif pour sécuriser le comportement des IA complexes."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "QuatreCATAR" }
+]
+license = { text = "MIT" }
+keywords = ["IA", "alignement", "cognition", "sécurité", "CATAR"]
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pytest"
+]
+
+# Inclusion des fichiers JSON du protocole
+[tool.setuptools.package-data]
+"protocol" = ["*.json"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+catar-cli = "interface.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/QuatreCATAR/CATAR-software"
+Repository = "https://github.com/QuatreCATAR/CATAR-software"
