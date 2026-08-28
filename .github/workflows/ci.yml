@@ -1,0 +1,65 @@
+name: CATAR CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # -----------------------------
+    # 1. Checkout du dépôt
+    # -----------------------------
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # -----------------------------
+    # 2. Installation de Python
+    # -----------------------------
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    # -----------------------------
+    # 3. Installation du package
+    # -----------------------------
+    - name: Install CATAR-software
+      run: |
+        pip install --upgrade pip
+        pip install .
+
+    # -----------------------------
+    # 4. Validation du protocole
+    # -----------------------------
+    - name: Validate protocol
+      run: |
+        python tools/validate.py
+
+    # -----------------------------
+    # 5. Exécution des tests
+    # -----------------------------
+    - name: Run tests
+      run: |
+        pytest -q
+
+    # -----------------------------
+    # 6. Génération du rapport automatique
+    # -----------------------------
+    - name: Generate build report
+      run: |
+        python tools/build.py
+
+    # -----------------------------
+    # 7. Upload des rapports
+    # -----------------------------
+    - name: Upload reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: catar-reports
+        path: output/reports/
