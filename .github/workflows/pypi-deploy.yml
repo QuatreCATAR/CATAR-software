@@ -1,0 +1,51 @@
+name: Publish CATAR-software to PyPI
+
+on:
+  push:
+    tags:
+      - "v*.*.*"     # Déploiement automatique lors d’un tag versionné
+  workflow_dispatch:  # Déploiement manuel
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    # -----------------------------
+    # 1. Checkout du dépôt
+    # -----------------------------
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # -----------------------------
+    # 2. Installation de Python
+    # -----------------------------
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    # -----------------------------
+    # 3. Installation des outils de build
+    # -----------------------------
+    - name: Install build tools
+      run: |
+        pip install --upgrade pip
+        pip install build twine
+
+    # -----------------------------
+    # 4. Construction du package
+    # -----------------------------
+    - name: Build package
+      run: |
+        python -m build
+
+    # -----------------------------
+    # 5. Publication sur PyPI
+    # -----------------------------
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.8.10
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        skip-existing: true
