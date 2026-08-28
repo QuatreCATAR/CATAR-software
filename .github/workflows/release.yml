@@ -1,0 +1,66 @@
+name: CATAR Release Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version à publier (ex: 1.2.0)"
+        required: true
+      generate_tag:
+        description: "Créer automatiquement le tag Git"
+        required: false
+        default: "true"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    # -----------------------------
+    # 1. Checkout du dépôt
+    # -----------------------------
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0   # nécessaire pour générer le changelog
+
+    # -----------------------------
+    # 2. Génération du changelog automatique
+    # -----------------------------
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@v4.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # -----------------------------
+    # 3. Création du tag (optionnel)
+    # -----------------------------
+    - name: Create tag
+      if: ${{ github.event.inputs.generate_tag == 'true' }}
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git tag v${{ github.event.inputs.version }}
+        git push origin v${{ github.event.inputs.version }}
+
+    # -----------------------------
+    # 4. Création du ZIP du projet
+    # -----------------------------
+    - name: Create release archive
+      run: |
+        mkdir artifacts
+        zip -r artifacts/CATAR-software-${{ github.event.inputs.version }}.zip . -x "*.git*"
+
+    # -----------------------------
+    # 5. Création de la release GitHub
+    # -----------------------------
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ github.event.inputs.version }}
+        name: "CATAR-software v${{ github.event.inputs.version }}"
+        body: ${{ steps.changelog.outputs.changelog }}
+        files: artifacts/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
