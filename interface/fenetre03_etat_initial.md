@@ -61,3 +61,6 @@ Ce bouton ouvre la fenêtre suivante :
 
 Code
 interface/fenetre04_transformation.md
+✔️ Fin de la FENÊTRE 03
+Cette page constitue le point de départ du passage cognitif.
+Elle lance le questionnaire et prépare la lecture du Corpus CATAR.
