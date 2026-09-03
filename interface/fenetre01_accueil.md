@@ -57,3 +57,5 @@ Ce bouton ouvre la fenêtre suivante :
 
 Code
 interface/fenetre02_description.md
+✔️ Fin de la FENÊTRE 01
+Cette page introduit le logiciel et prépare l’utilisateur au passage CATAR.
