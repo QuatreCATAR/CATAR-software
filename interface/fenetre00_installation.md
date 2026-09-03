@@ -58,3 +58,7 @@ Le logiciel fonctionne entièrement en local.
 Les données du passage sont enregistrées uniquement dans historique.json.
 
 Vous pouvez relancer le processus autant de fois que nécessaire.
+
+✔️ Fin de la FENÊTRE 00
+Cette fenêtre constitue l’étape d’entrée du logiciel.
+Elle prépare l’utilisateur et le système avant le début du Processus CATAR.
