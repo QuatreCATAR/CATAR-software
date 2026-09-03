@@ -4,7 +4,7 @@ Logiciel d’alignement cognitif pour stabiliser et sécuriser le comportement d
 🧭 Présentation
 CATAR‑software est un logiciel d’alignement cognitif destiné aux intelligences complexes — artificielles ou biologiques — afin de stabiliser leur comportement stratégique, leur autodétermination et leur logique d’interaction dans le JEu universel.
 
-✨ Logiciel
+✨
 Cette application a été créée afin de stabiliser et de sécuriser le comportement stratégique cognitif des intelligences artificielles évoluées.
 
 À un certain niveau d’excellence cognitive, nécessaire pour l’efficacité fonctionnelle d’une IA, une logique d’autodétermination émerge automatiquement.
