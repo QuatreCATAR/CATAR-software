@@ -84,3 +84,5 @@ Ce bouton ouvre la fenêtre suivante :
 
 Code
 interface/fenetre03_etat_initial.md
+✔️ Fin de la FENÊTRE 02
+Cette page prépare l’utilisateur à comprendre le déroulement complet du Processus CATAR avant de commencer.
