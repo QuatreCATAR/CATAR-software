@@ -54,3 +54,6 @@ Ce bouton ouvre la fenêtre suivante :
 
 Code
 interface/fenetre05_verification.md
+✔️ Fin de la FENÊTRE 04
+Cette page constitue la phase de transformation cognitive du passage CATAR.
+Elle prépare le système à répondre au Contrôle de Connaissance.
