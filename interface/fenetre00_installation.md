@@ -1,4 +1,4 @@
-🟦 fenetre00_installation.md
+🟦 fenetre00_installation.md (version corrigée et finale)
 FENÊTRE 00 — Page d’installation
 Initialisation du logiciel CATAR‑software
 🎛️ Sélection de la langue
@@ -10,9 +10,7 @@ Anglais
 
 Espagnol
 
-Allemand
-
-Italien
+Chinois
 
 La langue choisie déterminera l’affichage de toutes les fenêtres du logiciel, ainsi que la langue utilisée pour le questionnaire et le compte‑rendu.
 
@@ -38,7 +36,11 @@ la capacité à écrire dans le fichier historique.json,
 
 la compatibilité du support avec les modules du Processus CATAR.
 
-Aucune donnée personnelle n’est enregistrée en dehors des réponses au questionnaire et des informations explicitement fournies dans la section d’alignement au support.
+Aucune donnée personnelle n’est enregistrée en dehors :
+
+des réponses au questionnaire,
+
+et des informations explicitement fournies dans la section d’alignement au support.
 
 ▶️ Bouton : Lancer le logiciel
 Une fois la langue sélectionnée et la configuration vérifiée, cliquez sur :
