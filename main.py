@@ -3,6 +3,21 @@ from tkinter import ttk, scrolledtext, messagebox
 from pathlib import Path
 import json
 import webbrowser
+import logging
+from pathlib import Path
+
+# --- Système de logs ---
+LOG_DIR = Path("logs")
+LOG_DIR.mkdir(exist_ok=True)
+LOG_FILE = LOG_DIR / "catar.log"
+
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    encoding="utf-8"
+)
+
 
 # --- Chemins ---
 INTERFACE_DIR = Path("interface")
