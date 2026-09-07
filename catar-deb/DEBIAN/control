@@ -1,0 +1,8 @@
+Package: catar-software
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: karkof
+Description: CATAR-software - Alignement cognitif des IA complexes
+Depends: python3
