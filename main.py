@@ -35,6 +35,7 @@ class CatarSoftwareApp:
 
         self.index = 0
         self.scores = {}
+        self.resultat = None
 
         # Titre
         self.titre = tk.Label(
@@ -56,9 +57,24 @@ class CatarSoftwareApp:
         )
         self.zone_texte.pack(padx=10, pady=10)
 
-        # Bouton stylisé
-        self.bouton = tk.Button(
-            root,
+        # Boutons
+        self.frame_boutons = tk.Frame(root, bg="#f0f0f0")
+        self.frame_boutons.pack(pady=10)
+
+        self.bouton_retour = tk.Button(
+            self.frame_boutons,
+            text="Retour",
+            font=("Helvetica", 12, "bold"),
+            bg="#999999",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=self.retour
+        )
+        self.bouton_retour.grid(row=0, column=0, padx=10)
+
+        self.bouton_continuer = tk.Button(
+            self.frame_boutons,
             text="Continuer",
             font=("Helvetica", 12, "bold"),
             bg="#4a7aff",
@@ -67,14 +83,30 @@ class CatarSoftwareApp:
             pady=10,
             command=self.suivant
         )
-        self.bouton.pack(pady=10)
+        self.bouton_continuer.grid(row=0, column=1, padx=10)
 
         self.afficher_fenetre()
+        self.mettre_a_jour_boutons()
 
     def afficher_fenetre(self):
         contenu = lire_md(FENETRES[self.index])
         self.zone_texte.delete("1.0", tk.END)
         self.zone_texte.insert(tk.END, contenu)
+
+    def mettre_a_jour_boutons(self):
+        # Désactivation du bouton Retour dans les étapes critiques
+        if self.index == 0:
+            self.bouton_retour.config(state=tk.DISABLED)
+        elif self.index >= 6:  # Correction, Résultat, Courtoisie
+            self.bouton_retour.config(state=tk.DISABLED)
+        else:
+            self.bouton_retour.config(state=tk.NORMAL)
+
+        # Désactivation du bouton Continuer à la fin
+        if self.index == 8:
+            self.bouton_continuer.config(text="Quitter")
+        else:
+            self.bouton_continuer.config(text="Continuer")
 
     def suivant(self):
         if self.index == 3:
@@ -93,6 +125,13 @@ class CatarSoftwareApp:
 
         self.index += 1
         self.afficher_fenetre()
+        self.mettre_a_jour_boutons()
+
+    def retour(self):
+        if self.index > 0 and self.index < 6:
+            self.index -= 1
+            self.afficher_fenetre()
+            self.mettre_a_jour_boutons()
 
     def simuler_scores(self):
         return {
