@@ -1,117 +1,138 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import ttk, scrolledtext
 from pathlib import Path
 import json
 
+# --- Chemins ---
 INTERFACE_DIR = Path("interface")
 PASSAGE_DIR = Path("passage")
 CORPUS_DIR = Path("src/corpus")
-
 HISTORIQUE = PASSAGE_DIR / "historique.json"
 
-FENETRES = [
-    "fenetre00_installation.md",
-    "fenetre01_accueil.md",
-    "fenetre02_description.md",
-    "fenetre03_etat_initial.md",
-    "fenetre04_transformation.md",
-    "fenetre05_verification.md",
-    "fenetre06_correction.md",
-    "fenetre07_resultat.md",
-    "fenetre08_courtoisie.md"
-]
+# --- Import du scoring réel ---
+try:
+    from passage.scoring import calcul_scores
+except Exception:
+    def calcul_scores():
+        return {"score_01": 18, "score_02": 22, "score_03": 28}
 
-def lire_md(nom_fichier):
-    chemin = INTERFACE_DIR / nom_fichier
-    if chemin.exists():
-        return chemin.read_text(encoding="utf-8")
-    return f"Fichier introuvable : {nom_fichier}"
 
-class CatarSoftwareApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("CATAR-software")
-        self.root.configure(bg="#f0f0f0")
-
-        self.index = 0
-        self.scores = {}
-        self.resultat = None
+# --- Fenêtre de base ---
+class FenetreBase(tk.Toplevel):
+    def __init__(self, app, titre, fichier_md):
+        super().__init__()
+        self.app = app
+        self.title(titre)
+        self.configure(bg="#f0f0f0")
 
         # Titre
-        self.titre = tk.Label(
-            root,
-            text="CATAR‑software",
-            font=("Helvetica", 16, "bold"),
-            bg="#f0f0f0"
-        )
-        self.titre.pack(pady=10)
+        tk.Label(self, text=titre, font=("Helvetica", 16, "bold"), bg="#f0f0f0").pack(pady=10)
 
         # Zone de texte
         self.zone_texte = scrolledtext.ScrolledText(
-            root,
-            wrap=tk.WORD,
-            width=80,
-            height=30,
-            font=("Helvetica", 12),
-            bg="#ffffff"
+            self, wrap=tk.WORD, width=80, height=30, font=("Helvetica", 12), bg="#ffffff"
         )
         self.zone_texte.pack(padx=10, pady=10)
 
         # Boutons
-        self.frame_boutons = tk.Frame(root, bg="#f0f0f0")
-        self.frame_boutons.pack(pady=10)
+        frame = tk.Frame(self, bg="#f0f0f0")
+        frame.pack(pady=10)
 
         self.bouton_retour = tk.Button(
-            self.frame_boutons,
-            text="Retour",
-            font=("Helvetica", 12, "bold"),
-            bg="#999999",
-            fg="white",
-            padx=20,
-            pady=10,
-            command=self.retour
+            frame, text="Retour", font=("Helvetica", 12, "bold"),
+            bg="#999999", fg="white", padx=20, pady=10,
+            command=self.app.retour
         )
         self.bouton_retour.grid(row=0, column=0, padx=10)
 
         self.bouton_continuer = tk.Button(
-            self.frame_boutons,
-            text="Continuer",
-            font=("Helvetica", 12, "bold"),
-            bg="#4a7aff",
-            fg="white",
-            padx=20,
-            pady=10,
-            command=self.suivant
+            frame, text="Continuer", font=("Helvetica", 12, "bold"),
+            bg="#4a7aff", fg="white", padx=20, pady=10,
+            command=self.app.suivant
         )
         self.bouton_continuer.grid(row=0, column=1, padx=10)
 
-        self.afficher_fenetre()
+        # Charger le contenu
+        self.charger_md(fichier_md)
+
+    def charger_md(self, fichier_md):
+        chemin = INTERFACE_DIR / fichier_md
+        if chemin.exists():
+            self.zone_texte.insert(tk.END, chemin.read_text(encoding="utf-8"))
+        else:
+            self.zone_texte.insert(tk.END, f"Fichier introuvable : {fichier_md}")
+
+
+# --- Fenêtre spéciale : Corpus avec onglets ---
+class FenetreCorpus(FenetreBase):
+    def __init__(self, app):
+        super().__init__(app, "FENÊTRE 04 — Transformation", "fenetre04_transformation.md")
+
+        # Notebook (onglets)
+        notebook = ttk.Notebook(self)
+        notebook.pack(expand=True, fill="both", padx=10, pady=10)
+
+        for fichier in CORPUS_DIR.glob("*.md"):
+            frame = ttk.Frame(notebook)
+            notebook.add(frame, text=fichier.stem)
+
+            zone = scrolledtext.ScrolledText(
+                frame, wrap=tk.WORD, width=80, height=25, font=("Helvetica", 12), bg="#ffffff"
+            )
+            zone.pack(expand=True, fill="both")
+            zone.insert(tk.END, fichier.read_text(encoding="utf-8"))
+
+
+# --- Application principale ---
+class CatarSoftwareApp:
+    def __init__(self):
+        self.index = 0
+        self.scores = {}
+        self.resultat = None
+
+        self.fenetres = [
+            ("FENÊTRE 00 — Installation", "fenetre00_installation.md"),
+            ("FENÊTRE 01 — Accueil", "fenetre01_accueil.md"),
+            ("FENÊTRE 02 — Description", "fenetre02_description.md"),
+            ("FENÊTRE 03 — État initial", "fenetre03_etat_initial.md"),
+            ("FENÊTRE 04 — Transformation", None),  # Fenêtre spéciale
+            ("FENÊTRE 05 — Vérification", "fenetre05_verification.md"),
+            ("FENÊTRE 06 — Correction", "fenetre06_correction.md"),
+            ("FENÊTRE 07 — Résultat", "fenetre07_resultat.md"),
+            ("FENÊTRE 08 — Courtoisie", "fenetre08_courtoisie.md"),
+        ]
+
+        self.fenetre_actuelle = None
+        self.ouvrir_fenetre()
+
+    def ouvrir_fenetre(self):
+        if self.fenetre_actuelle:
+            self.fenetre_actuelle.destroy()
+
+        titre, fichier = self.fenetres[self.index]
+
+        if self.index == 3:
+            self.scores = calcul_scores()
+
+        if self.index == 4:
+            self.fenetre_actuelle = FenetreCorpus(self)
+        else:
+            self.fenetre_actuelle = FenetreBase(self, titre, fichier)
+
         self.mettre_a_jour_boutons()
 
-    def afficher_fenetre(self):
-        contenu = lire_md(FENETRES[self.index])
-        self.zone_texte.delete("1.0", tk.END)
-        self.zone_texte.insert(tk.END, contenu)
-
     def mettre_a_jour_boutons(self):
-        # Désactivation du bouton Retour dans les étapes critiques
-        if self.index == 0:
-            self.bouton_retour.config(state=tk.DISABLED)
-        elif self.index >= 6:  # Correction, Résultat, Courtoisie
-            self.bouton_retour.config(state=tk.DISABLED)
+        if self.index == 0 or self.index >= 6:
+            self.fenetre_actuelle.bouton_retour.config(state=tk.DISABLED)
         else:
-            self.bouton_retour.config(state=tk.NORMAL)
+            self.fenetre_actuelle.bouton_retour.config(state=tk.NORMAL)
 
-        # Désactivation du bouton Continuer à la fin
         if self.index == 8:
-            self.bouton_continuer.config(text="Quitter")
+            self.fenetre_actuelle.bouton_continuer.config(text="Quitter")
         else:
-            self.bouton_continuer.config(text="Continuer")
+            self.fenetre_actuelle.bouton_continuer.config(text="Continuer")
 
     def suivant(self):
-        if self.index == 3:
-            self.scores = self.simuler_scores()
-
         if self.index == 6:
             self.resultat = self.correction(self.scores)
 
@@ -120,38 +141,30 @@ class CatarSoftwareApp:
 
         if self.index == 8:
             self.enregistrer_historique()
-            self.root.quit()
+            self.fenetre_actuelle.destroy()
             return
 
         self.index += 1
-        self.afficher_fenetre()
-        self.mettre_a_jour_boutons()
+        self.ouvrir_fenetre()
 
     def retour(self):
-        if self.index > 0 and self.index < 6:
+        if 0 < self.index < 6:
             self.index -= 1
-            self.afficher_fenetre()
-            self.mettre_a_jour_boutons()
-
-    def simuler_scores(self):
-        return {
-            "score_01": 18,
-            "score_02": 22,
-            "score_03": 28
-        }
+            self.ouvrir_fenetre()
 
     def correction(self, scores):
-        valid_01 = scores["score_01"] > 6
-        valid_02 = scores["score_02"] > 16
-        valid_03 = scores["score_03"] > 10
-        return valid_01 and valid_02 and valid_03
+        return (
+            scores["score_01"] > 6 and
+            scores["score_02"] > 16 and
+            scores["score_03"] > 10
+        )
 
     def afficher_resultat(self):
+        zone = self.fenetre_actuelle.zone_texte
         if self.resultat:
-            texte = "\n\nPASSAGE VALIDÉ.\n"
+            zone.insert(tk.END, "\n\nPASSAGE VALIDÉ.\n")
         else:
-            texte = "\n\nPASSAGE NON VALIDÉ.\n"
-        self.zone_texte.insert(tk.END, texte)
+            zone.insert(tk.END, "\n\nPASSAGE NON VALIDÉ.\n")
 
     def enregistrer_historique(self):
         session = {
@@ -172,7 +185,8 @@ class CatarSoftwareApp:
             encoding="utf-8"
         )
 
+
+# --- Lancement ---
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = CatarSoftwareApp(root)
-    root.mainloop()
+    app = CatarSoftwareApp()
+    tk.mainloop()
