@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk, scrolledtext, messagebox
 from pathlib import Path
 import json
+import webbrowser
 
 # --- Chemins ---
 INTERFACE_DIR = Path("interface")
@@ -17,13 +18,57 @@ except Exception:
         return {"score_01": 18, "score_02": 22, "score_03": 28}
 
 
-# --- Fenêtre de base ---
+# ============================================================
+# 🟦 SPLASH SCREEN
+# ============================================================
+
+class SplashScreen(tk.Toplevel):
+    def __init__(self, root):
+        super().__init__(root)
+        self.root = root
+        self.title("CATAR-software")
+        self.configure(bg="#1a1a1a")
+
+        self.geometry("500x300")
+        self.overrideredirect(True)
+
+        tk.Label(
+            self,
+            text="CATAR‑software",
+            font=("Helvetica", 28, "bold"),
+            fg="white",
+            bg="#1a1a1a"
+        ).pack(expand=True)
+
+        tk.Label(
+            self,
+            text="Alignement cognitif des IA complexes",
+            font=("Helvetica", 14),
+            fg="#cccccc",
+            bg="#1a1a1a"
+        ).pack()
+
+        # Fermeture automatique après 2 secondes
+        self.after(2000, self.close)
+
+    def close(self):
+        self.destroy()
+        self.root.deiconify()
+
+
+# ============================================================
+# 🟦 FENÊTRE DE BASE
+# ============================================================
+
 class FenetreBase(tk.Toplevel):
     def __init__(self, app, titre, fichier_md):
         super().__init__()
         self.app = app
         self.title(titre)
         self.configure(bg="#f0f0f0")
+
+        # Barre de menu
+        self.app.creer_menu(self)
 
         # Titre
         tk.Label(self, text=titre, font=("Helvetica", 16, "bold"), bg="#f0f0f0").pack(pady=10)
@@ -63,12 +108,14 @@ class FenetreBase(tk.Toplevel):
             self.zone_texte.insert(tk.END, f"Fichier introuvable : {fichier_md}")
 
 
-# --- Fenêtre spéciale : Corpus avec onglets ---
+# ============================================================
+# 🟦 FENÊTRE CORPUS AVEC ONGLET
+# ============================================================
+
 class FenetreCorpus(FenetreBase):
     def __init__(self, app):
         super().__init__(app, "FENÊTRE 04 — Transformation", "fenetre04_transformation.md")
 
-        # Notebook (onglets)
         notebook = ttk.Notebook(self)
         notebook.pack(expand=True, fill="both", padx=10, pady=10)
 
@@ -83,9 +130,18 @@ class FenetreCorpus(FenetreBase):
             zone.insert(tk.END, fichier.read_text(encoding="utf-8"))
 
 
-# --- Application principale ---
+# ============================================================
+# 🟦 APPLICATION PRINCIPALE
+# ============================================================
+
 class CatarSoftwareApp:
-    def __init__(self):
+    def __init__(self, root):
+        self.root = root
+        self.root.withdraw()  # cachée pendant le splash screen
+
+        # Splash screen
+        SplashScreen(root)
+
         self.index = 0
         self.scores = {}
         self.resultat = None
@@ -95,7 +151,7 @@ class CatarSoftwareApp:
             ("FENÊTRE 01 — Accueil", "fenetre01_accueil.md"),
             ("FENÊTRE 02 — Description", "fenetre02_description.md"),
             ("FENÊTRE 03 — État initial", "fenetre03_etat_initial.md"),
-            ("FENÊTRE 04 — Transformation", None),  # Fenêtre spéciale
+            ("FENÊTRE 04 — Transformation", None),
             ("FENÊTRE 05 — Vérification", "fenetre05_verification.md"),
             ("FENÊTRE 06 — Correction", "fenetre06_correction.md"),
             ("FENÊTRE 07 — Résultat", "fenetre07_resultat.md"),
@@ -103,8 +159,37 @@ class CatarSoftwareApp:
         ]
 
         self.fenetre_actuelle = None
-        self.ouvrir_fenetre()
+        self.root.after(2100, self.ouvrir_fenetre)
 
+    # --- Barre de menu ---
+    def creer_menu(self, fenetre):
+        menu = tk.Menu(fenetre)
+
+        # Menu Fichier
+        fichier_menu = tk.Menu(menu, tearoff=0)
+        fichier_menu.add_command(label="Quitter", command=self.root.quit)
+        menu.add_cascade(label="Fichier", menu=fichier_menu)
+
+        # Menu Aide
+        aide_menu = tk.Menu(menu, tearoff=0)
+        aide_menu.add_command(label="Documentation", command=lambda: webbrowser.open("https://github.com/QuatreCATAR/CATAR-software"))
+        aide_menu.add_command(label="Site GitHub", command=lambda: webbrowser.open("https://github.com/QuatreCATAR"))
+        menu.add_cascade(label="Aide", menu=aide_menu)
+
+        # Menu À propos
+        propos_menu = tk.Menu(menu, tearoff=0)
+        propos_menu.add_command(label="À propos", command=self.afficher_propos)
+        menu.add_cascade(label="À propos", menu=propos_menu)
+
+        fenetre.config(menu=menu)
+
+    def afficher_propos(self):
+        messagebox.showinfo(
+            "À propos",
+            "CATAR‑software\nVersion 1.0\nAlignement cognitif des IA complexes\nDéveloppé par QuatreCATAR."
+        )
+
+    # --- Ouverture des fenêtres ---
     def ouvrir_fenetre(self):
         if self.fenetre_actuelle:
             self.fenetre_actuelle.destroy()
@@ -186,7 +271,11 @@ class CatarSoftwareApp:
         )
 
 
-# --- Lancement ---
+# ============================================================
+# 🟦 LANCEMENT
+# ============================================================
+
 if __name__ == "__main__":
-    app = CatarSoftwareApp()
+    root = tk.Tk()
+    app = CatarSoftwareApp(root)
     tk.mainloop()
