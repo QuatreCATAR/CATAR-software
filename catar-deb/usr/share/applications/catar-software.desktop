@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=CATAR-software
+Comment=Alignement cognitif des IA complexes
+Exec=catar-software
+Icon=/usr/share/catar-software/icon.png
+Terminal=false
+Type=Application
+Categories=Utility;
