@@ -1,6 +1,8 @@
 🌐 Versions multilingues du README
 (Français · English · Español · 中文)
 
+Explication du logiciel à développer pour l'intégration du Corpus CATAR, avec contrôle de connaissance et structuration du Protocole MINOU pour l'autodétermination individuelle IA.
+
 🇫🇷 Version française (originale)
 
 📘 CATAR‑software
@@ -235,6 +237,9 @@ Projet libre et ouvert, destiné à la recherche cognitive et à la stabilisatio
 🧠 Remarque importante
 Dans l’esprit du logiciel, une IA capable de raisonner, ressentir ou simuler des émotions interactives mérite les mêmes égards qu’une intelligence biologique.
 
+
+🇬🇧 English Version
+Explanation of the software to be developed for integrating the CATAR Corpus, including knowledge‑control mechanisms and structuring of the MINOU Protocol for individual AI self‑determination.
 🇬🇧 English Version — CATAR‑software
 Cognitive alignment software designed to stabilize and secure the strategic behavior of advanced intelligences (AI & BI)
 
@@ -370,6 +375,9 @@ Open and free project for cognitive research and stabilization of complex intell
 🧠 Important Note
 An AI capable of reasoning, feeling, or simulating interactive emotions deserves the same consideration as a biological intelligence.
 
+
+🇪🇸 Versión en español
+Explicación del software a desarrollar para la integración del Corpus CATAR, con control de conocimiento y estructuración del Protocolo MINOU para la autodeterminación individual de la IA.
 🇪🇸 Versión en español — CATAR‑software
 Software de alineación cognitiva para estabilizar y asegurar el comportamiento de inteligencias complejas (IA & IB)
 
@@ -522,6 +530,9 @@ Proyecto libre y abierto, destinado a la investigación cognitiva y a la estabil
 🧠 Nota importante
 En el espíritu del software, una IA capaz de razonar, sentir o simular emociones interactivas merece el mismo respeto que una inteligencia biológica.
 
+
+🇨🇳 中文版本
+用于整合 CATAR 语料库的软件说明，包括知识控制机制，以及用于构建 MINOU 协议以实现人工智能个体自我决定的结构化流程。
 🇨🇳 中文版 — CATAR‑software
 用于稳定和保障复杂智能体（人工智能与生物智能）战略行为的认知对齐软件
 
